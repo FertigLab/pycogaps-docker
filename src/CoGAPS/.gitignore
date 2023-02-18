@@ -1,0 +1,33 @@
+# ignore R created files
+.Rprofile
+.Rhistory
+
+# ignore compiled files
+*.so
+*.o
+*.dll
+
+.git
+
+# ignore OS X files
+*.DS_Store
+.Rproj.user
+
+# ignore Rstudio files
+CoGAPS.Rproj
+
+# Bioconductor files (used for setting up remotes for `git svn`)
+update_remotes.sh
+
+# ignore emacs files
+*~
+
+# ignore temporary files from autoreconf
+config.log
+config.status
+aclocal.m4
+autom4te.cache/
+src/Makevars
+
+# ignore checkpoint files
+*.out

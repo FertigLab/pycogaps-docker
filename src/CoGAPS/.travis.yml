@@ -1,0 +1,86 @@
+notifications:
+  slack: fertiglab:LZeNoaS7BnLfqP6XuHiDYdts
+
+addons:
+  apt:
+    packages: ccache
+
+cache: ccache
+
+jobs:
+  fast_finish: true
+  allow_failures:
+    - name: Linting
+    - name: Code Formatting
+    - name: Bioconductor Devel Testing - Linux
+    - name: Bioconductor Devel Testing - OSX
+  include:
+    - name: "Bioconductor Release Testing - Linux"
+      os: linux
+      if: tag IS NOT present
+      language: r
+      r: bioc-release
+      repos:
+        CRAN: http://cran.rstudio.com/ 
+      before_install:
+        - mkdir $HOME/.R && echo -e 'VER=\nCCACHE=ccache\nCC=$(CCACHE) gcc$(VER) -std=gnu99\nCXX=$(CCACHE) g++$(VER)\nC11=$(CCACHE) g++$(VER)\nC14=$(CCACHE) g++$(VER)\nFC=$(CCACHE) gfortran$(VER)\nF77=$(CCACHE) gfortran$(VER)' > $HOME/.R/Makevars
+
+    - name: "Bioconductor Devel Testing - Linux"
+      os: linux
+      if: tag IS NOT present
+      language: r
+      r: bioc-devel
+      repos:
+        CRAN: http://cran.rstudio.com/ 
+      before_install:
+        - mkdir $HOME/.R && echo -e 'VER=\nCCACHE=ccache\nCC=$(CCACHE) gcc$(VER) -std=gnu99\nCXX=$(CCACHE) g++$(VER)\nC11=$(CCACHE) g++$(VER)\nC14=$(CCACHE) g++$(VER)\nFC=$(CCACHE) gfortran$(VER)\nF77=$(CCACHE) gfortran$(VER)' > $HOME/.R/Makevars
+
+    - name: "Bioconductor Release Testing - OSX"
+      os: osx
+      if: tag IS NOT present
+      language: r
+      r: bioc-release
+      repos:
+        CRAN: http://cran.rstudio.com/ 
+
+    - name: "Bioconductor Devel Testing - OSX"
+      os: osx
+      if: tag IS NOT present
+      language: r
+      r: bioc-devel
+      repos:
+        CRAN: http://cran.rstudio.com/ 
+
+    - name: "Test Running in Debug Mode"
+      if: tag IS NOT present
+      language: r
+      r: release
+      before_install:
+        - mkdir $HOME/.R && echo -e 'VER=\nCCACHE=ccache\nCC=$(CCACHE) gcc$(VER) -std=gnu99\nCXX=$(CCACHE) g++$(VER)\nC11=$(CCACHE) g++$(VER)\nC14=$(CCACHE) g++$(VER)\nFC=$(CCACHE) gfortran$(VER)\nF77=$(CCACHE) gfortran$(VER)' > $HOME/.R/Makevars
+      install:
+        - R -e 'install.packages(c("BiocManager", "desc"), repos="http://cran.rstudio.com/")'
+        - R -e 'BiocManager::install(desc::desc_get_deps()$package, site_repository=c("http://cran.rstudio.com/"))'
+        - R CMD build --no-build-vignettes .
+        - R CMD INSTALL --configure-args=" --enable-debug " *tar.gz
+      script: R -f inst/scripts/debugRuns.R
+
+    - name: "Linting"
+      if: tag IS NOT present
+      script: echo "linting not implemented"
+
+    - name: "Code Formatting"
+      if: tag IS NOT present
+      script: echo "formatting not implemented"
+
+#- stage: Valgrind Analysis
+#  before_install:
+#    - mkdir $HOME/.R && echo -e 'VER=\nCCACHE=ccache\nCC=$(CCACHE) gcc$(VER) -std=gnu99\nCXX=$(CCACHE) g++$(VER)\nC11=$(CCACHE) g++$(VER)\nC14=$(CCACHE) g++$(VER)\nFC=$(CCACHE) gfortran$(VER)\nF77=$(CCACHE) gfortran$(VER)' > $HOME/.R/Makevars
+#    - sudo apt-get update -qq
+#    - sudo apt-get install -qq valgrind
+#  install:
+#    - R -e 'install.packages(c("BiocManager", "desc"))'
+#    - R -e 'BiocManager::install(desc::desc_get_deps()$package)'
+#    - R CMD build --no-build-vignettes .
+#    - R CMD INSTALL --configure-args=" --disable-openmp " *tar.gz
+#  script: R -d "valgrind --tool=memcheck --leak-check=yes" -e 'library(CoGAPS); data(GIST); CoGAPS(GIST.matrix, nIterations=1000, outputFrequency=250)'
+
