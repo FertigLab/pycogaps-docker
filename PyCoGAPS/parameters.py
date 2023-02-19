@@ -230,6 +230,8 @@ def setParam(paramobj: CoParams, whichParam, value):
         setattr(paramobj.gaps, whichParam, value)
     elif whichParam == "checkpointInFile":
         whichParam = "checkpointFile"
+        if value is None:
+            return
         setattr(paramobj.gaps, whichParam, value)
     elif whichParam == "snapshotPhase":
         if value == "sampling":
