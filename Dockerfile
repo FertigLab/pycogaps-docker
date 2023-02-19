@@ -6,7 +6,7 @@ WORKDIR /home/user
 
 RUN git clone --recurse-submodules https://github.com/FertigLab/pycogaps-docker.git
 
-WORKDIR ./pycogaps-gpn/
+WORKDIR ./pycogaps-docker/
 RUN git pull
 
 RUN pip install -r requirements.txt --user

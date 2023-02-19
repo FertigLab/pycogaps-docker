@@ -243,6 +243,8 @@ def setParam(paramobj: CoParams, whichParam, value):
         #     print("Please choose one of: sampling, equilibration, all")
         #     return
         setattr(paramobj.gaps, whichParam, value)
+    elif whichParam == "uncertainty":
+        return
     else:
         setattr(paramobj.gaps, whichParam, value)
     return paramobj
