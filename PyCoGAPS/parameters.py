@@ -1,6 +1,7 @@
 from PyCoGAPS.config import *
 from PyCoGAPS.helper_functions import *
 from PyCoGAPS.subset_data import *
+import warnings
 
 class CoParams:
     """ Encapsulates all parameters for PyCoGAPS.
@@ -37,7 +38,10 @@ class CoParams:
                     adata = toAnndata(path, hdfKey, hdfRowKey, hdfColKey, transposeData=transposeData)
                 elif path.lower().endswith(".txt"):
                     table = pd.read_table(path, header=None)
+                    table.index = table.index.astype('string')
+                    table.columns = table.columns.astype('string')
                     adata = anndata.AnnData(table)
+                    warnings.filterwarnings("ignore", message="Transforming to str index.")
                 # adata.obs_names = table["symbol"] 
                 # we cannot assume this will be in the text file and will trip an error
                 else:
